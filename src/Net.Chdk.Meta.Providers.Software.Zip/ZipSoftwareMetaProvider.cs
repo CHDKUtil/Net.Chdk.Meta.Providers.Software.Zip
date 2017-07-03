@@ -1,10 +1,7 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
 using Net.Chdk.Detectors.Software;
-using Net.Chdk.Model.Category;
 using Net.Chdk.Model.Software;
-using Net.Chdk.Providers.Boot;
-using Net.Chdk.Providers.Category;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,30 +17,33 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
         private ILogger Logger { get; }
 
         private IBinarySoftwareDetector SoftwareDetector { get; }
+        private ICategoryMetaProvider CategoryProvider { get; }
         private IProductMetaProvider ProductProvider { get; }
         private ICameraMetaProvider CameraProvider { get; }
         private ISourceMetaProvider SourceProvider { get; }
         private IBuildMetaProvider BuildProvider { get; }
         private ICompilerMetaProvider CompilerProvider { get; }
+        private IEncodingMetaProvider EncodingProvider { get; }
 
         private string FileName { get; }
-        private CategoryInfo Category { get; }
 
-        public ZipSoftwareMetaProvider(IBinarySoftwareDetector softwareDetector, ICategoryProvider categoryProvider, IBootProviderResolver bootProviderResolver,
-            IProductMetaProvider productProvider, ICameraMetaProvider cameraProvider, ISourceMetaProvider sourceProvider, IBuildMetaProvider buildProvider, ICompilerMetaProvider compilerProvider,
+        public ZipSoftwareMetaProvider(IBinarySoftwareDetector softwareDetector, ICategoryMetaProvider categoryProvider, IBootMetaProvider bootProvider,
+            IProductMetaProvider productProvider, ICameraMetaProvider cameraProvider, ISourceMetaProvider sourceProvider,
+            IBuildMetaProvider buildProvider, ICompilerMetaProvider compilerProvider, IEncodingMetaProvider encodingProvider,
             ILogger<ZipSoftwareMetaProvider> logger)
         {
             Logger = logger;
 
             SoftwareDetector = softwareDetector;
+            CategoryProvider = categoryProvider;
             ProductProvider = productProvider;
             CameraProvider = cameraProvider;
             SourceProvider = sourceProvider;
             BuildProvider = buildProvider;
             CompilerProvider = compilerProvider;
+            EncodingProvider = encodingProvider;
 
-            Category = categoryProvider.GetCategories().Single();
-            FileName = bootProviderResolver.GetBootProvider(Category.Name).FileName;
+            FileName = bootProvider.FileName;
         }
 
         public IEnumerable<SoftwareInfo> GetSoftware(string path)
@@ -129,17 +129,13 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             if (software.Camera != null)
             {
                 ValidateSoftware(software, entry, name);
-                software.Source = SourceProvider.GetSource(software);
-                software.Build = BuildProvider.GetBuild(software);
-                software.Compiler = CompilerProvider.GetCompiler(software);
+                UpdateSoftware(software);
             }
             else
             {
                 var created = entry.DateTime.ToUniversalTime();
                 software.Product = ProductProvider.GetProduct(name, created);
-                software.Source = SourceProvider.GetSource(software);
-                software.Build = BuildProvider.GetBuild(software);
-                software.Compiler = CompilerProvider.GetCompiler(software);
+                UpdateSoftware(software);
                 software.Camera = CameraProvider.GetCamera(name);
             }
 
@@ -151,9 +147,6 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             var created = entry.DateTime.ToUniversalTime();
             var product = ProductProvider.GetProduct(name, created);
             var camera = CameraProvider.GetCamera(name);
-
-            if (!Category.Equals(software.Category))
-                Logger.LogWarning("Mismatching category name: {0}", software.Category.Name);
 
             if (!product.Name.Equals(software.Product.Name))
                 Logger.LogWarning("Mismatching product name: {0}", software.Product.Name);
@@ -169,6 +162,15 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
 
             if (!camera.Revision.Equals(software.Camera.Revision))
                 Logger.LogWarning("Mismatching revision: {0}", software.Camera.Revision);
+        }
+
+        private void UpdateSoftware(SoftwareInfo software)
+        {
+            software.Category = CategoryProvider.GetCategory(software);
+            software.Source = SourceProvider.GetSource(software);
+            software.Build = BuildProvider.GetBuild(software);
+            software.Compiler = CompilerProvider.GetCompiler(software);
+            software.Encoding = EncodingProvider.GetEncoding(software.Encoding);
         }
     }
 }
