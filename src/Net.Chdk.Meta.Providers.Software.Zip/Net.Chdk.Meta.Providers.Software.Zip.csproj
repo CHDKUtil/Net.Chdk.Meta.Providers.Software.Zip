@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FF9FD5ED-69A3-4081-94F4-458B44C9B3CE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Net.Chdk.Meta.Providers.Software.Zip</RootNamespace>
+    <AssemblyName>Net.Chdk.Meta.Providers.Software.Zip</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Logging.Abstractions.1.1.2\lib\netstandard1.1\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceCollectionExtensions.cs" />
+    <Compile Include="ZipSoftwareMetaProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Net.Chdk.Detectors.Software.Core\src\Net.Chdk.Detectors.Software.Core\Net.Chdk.Detectors.Software.Core.csproj">
+      <Project>{D385AB93-0DB5-45AA-994A-5E4B671BEF40}</Project>
+      <Name>Net.Chdk.Detectors.Software.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Net.Chdk.Meta.Providers.Core\src\Net.Chdk.Meta.Providers.Core\Net.Chdk.Meta.Providers.Core.csproj">
+      <Project>{A336D62C-4CAF-4B19-9602-8CE0E51B4EB4}</Project>
+      <Name>Net.Chdk.Meta.Providers.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Net.Chdk.Meta.Providers.Software.Core\src\Net.Chdk.Meta.Providers.Software.Core\Net.Chdk.Meta.Providers.Software.Core.csproj">
+      <Project>{3618b309-0690-43dc-9c1e-32df42d0f43c}</Project>
+      <Name>Net.Chdk.Meta.Providers.Software.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Net.Chdk.Model.Category\src\Net.Chdk.Model.Category\Net.Chdk.Model.Category.csproj">
+      <Project>{732DF01F-2379-4244-ABA1-48BA99EA1883}</Project>
+      <Name>Net.Chdk.Model.Category</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Net.Chdk.Model.Software\src\Net.Chdk.Model.Software\Net.Chdk.Model.Software.csproj">
+      <Project>{7F492AD5-C9E5-4E13-9587-D0B88BA8D209}</Project>
+      <Name>Net.Chdk.Model.Software</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Net.Chdk.Providers.Boot.Core\src\Net.Chdk.Providers.Boot.Core\Net.Chdk.Providers.Boot.Core.csproj">
+      <Project>{4E4FA15A-4A88-4CAF-A8E1-FC507177EAD4}</Project>
+      <Name>Net.Chdk.Providers.Boot.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Net.Chdk.Providers.Category.Core\src\Net.Chdk.Providers.Category.Core\Net.Chdk.Providers.Category.Core.csproj">
+      <Project>{05B4FC36-AB60-48A6-A12C-0D8BB73843DD}</Project>
+      <Name>Net.Chdk.Providers.Category.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="..\..\..\Net.Chdk.Core\src\Net.Chdk.Shared\Net.Chdk.Shared.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
