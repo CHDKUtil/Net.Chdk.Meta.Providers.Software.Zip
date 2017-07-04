@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
 using Net.Chdk.Detectors.Software;
+using Net.Chdk.Meta.Providers.Zip;
 using Net.Chdk.Model.Software;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,9 @@ using System.Threading;
 
 namespace Net.Chdk.Meta.Providers.Software.Zip
 {
-    sealed class ZipSoftwareMetaProvider : ISoftwareMetaProvider
+    sealed class ZipSoftwareMetaProvider : ZipMetaProvider<SoftwareInfo>, ISoftwareMetaProvider
     {
         private static readonly Version Version = new Version("1.0");
-
-        private ILogger Logger { get; }
 
         private IBinarySoftwareDetector SoftwareDetector { get; }
         private ICategoryMetaProvider CategoryProvider { get; }
@@ -25,15 +24,12 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
         private ICompilerMetaProvider CompilerProvider { get; }
         private IEncodingMetaProvider EncodingProvider { get; }
 
-        private string FileName { get; }
-
         public ZipSoftwareMetaProvider(IBinarySoftwareDetector softwareDetector, ICategoryMetaProvider categoryProvider, IBootMetaProvider bootProvider,
             IProductMetaProvider productProvider, ICameraMetaProvider cameraProvider, ISourceMetaProvider sourceProvider,
             IBuildMetaProvider buildProvider, ICompilerMetaProvider compilerProvider, IEncodingMetaProvider encodingProvider,
             ILogger<ZipSoftwareMetaProvider> logger)
+            : base(bootProvider, logger)
         {
-            Logger = logger;
-
             SoftwareDetector = softwareDetector;
             CategoryProvider = categoryProvider;
             ProductProvider = productProvider;
@@ -42,8 +38,6 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             BuildProvider = buildProvider;
             CompilerProvider = compilerProvider;
             EncodingProvider = encodingProvider;
-
-            FileName = bootProvider.FileName;
         }
 
         public IEnumerable<SoftwareInfo> GetSoftware(string path)
@@ -61,55 +55,12 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             using (var stream = new FileStream(path, FileMode.Open))
             {
                 var name = Path.GetFileName(path);
-                return GetSoftware(stream, name);
+                return GetItems(stream, name);
             }
         }
 
-        private IEnumerable<SoftwareInfo> GetSoftware(Stream stream, string name)
+        protected override SoftwareInfo DoGetItem(ZipFile zip, string name, ZipEntry entry)
         {
-            using (var zip = new ZipFile(stream))
-            {
-                return GetSoftware(zip, name).ToArray();
-            }
-        }
-
-        private IEnumerable<SoftwareInfo> GetSoftware(ZipFile zip, string name)
-        {
-            Logger.LogInformation("Enter {0}", name);
-            foreach (ZipEntry entry in zip)
-            {
-                var items = GetSoftware(zip, entry);
-                foreach (var item in items)
-                    yield return item;
-                yield return GetSoftware(zip, name, entry);
-            }
-            Logger.LogInformation("Exit {0}", name);
-        }
-
-        private IEnumerable<SoftwareInfo> GetSoftware(ZipFile zip, ZipEntry entry)
-        {
-            if (!entry.IsFile)
-                return Enumerable.Empty<SoftwareInfo>();
-
-            var ext = Path.GetExtension(entry.Name);
-            if (!".zip".Equals(ext, StringComparison.OrdinalIgnoreCase))
-                return Enumerable.Empty<SoftwareInfo>();
-            var name = Path.GetFileName(entry.Name);
-
-            using (var stream = zip.GetInputStream(entry))
-            {
-                return GetSoftware(stream, name);
-            }
-        }
-
-        private SoftwareInfo GetSoftware(ZipFile zip, string name, ZipEntry entry)
-        {
-            if (!entry.IsFile)
-                return null;
-
-            if (!FileName.Equals(entry.Name, StringComparison.OrdinalIgnoreCase))
-                return null;
-
             using (var stream = zip.GetInputStream(entry))
             using (var memoryStream = new MemoryStream((int)entry.Size))
             {

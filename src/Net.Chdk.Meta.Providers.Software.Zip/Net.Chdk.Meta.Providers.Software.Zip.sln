@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net.Chdk.Json", "..\..\..\N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net.Chdk.Meta.Providers.Core", "..\..\..\Net.Chdk.Meta.Providers.Core\src\Net.Chdk.Meta.Providers.Core\Net.Chdk.Meta.Providers.Core.csproj", "{A336D62C-4CAF-4B19-9602-8CE0E51B4EB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net.Chdk.Meta.Providers.Zip", "..\..\..\Net.Chdk.Meta.Providers.Zip\src\Net.Chdk.Meta.Providers.Zip\Net.Chdk.Meta.Providers.Zip.csproj", "{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\..\Net.Chdk.Core\src\Net.Chdk.Shared\Net.Chdk.Shared.projitems*{05b4fc36-ab60-48a6-a12c-0d8bb73843dd}*SharedItemsImports = 4
@@ -37,6 +39,7 @@ Global
 		..\..\..\Net.Chdk.Core\src\Net.Chdk.Shared\Net.Chdk.Shared.projitems*{a41d61fe-2fb8-4892-ac7d-ecee7e61c637}*SharedItemsImports = 4
 		..\..\..\Net.Chdk.Core\src\Net.Chdk.Shared\Net.Chdk.Shared.projitems*{bc3c0d74-5a68-4791-be4b-8b2bc724c0ec}*SharedItemsImports = 4
 		..\..\..\Net.Chdk.Core\src\Net.Chdk.Shared\Net.Chdk.Shared.projitems*{d385ab93-0db5-45aa-994a-5e4b671bef40}*SharedItemsImports = 4
+		..\..\..\Net.Chdk.Core\src\Net.Chdk.Shared\Net.Chdk.Shared.projitems*{e25d4e5a-692e-4cde-a1b4-3fb121ab67fe}*SharedItemsImports = 4
 		..\..\..\Net.Chdk.Core\src\Net.Chdk.Shared\Net.Chdk.Shared.projitems*{ff9fd5ed-69a3-4081-94f4-458b44c9b3ce}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +129,14 @@ Global
 		{A336D62C-4CAF-4B19-9602-8CE0E51B4EB4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A336D62C-4CAF-4B19-9602-8CE0E51B4EB4}.Release|x64.ActiveCfg = Release|Any CPU
 		{A336D62C-4CAF-4B19-9602-8CE0E51B4EB4}.Release|x64.Build.0 = Release|Any CPU
+		{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}.Debug|x64.Build.0 = Debug|Any CPU
+		{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}.Release|x64.ActiveCfg = Release|Any CPU
+		{E25D4E5A-692E-4CDE-A1B4-3FB121AB67FE}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
