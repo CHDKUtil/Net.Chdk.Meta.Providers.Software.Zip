@@ -43,20 +43,11 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
         public IEnumerable<SoftwareInfo> GetSoftware(string path)
         {
             if (!path.Contains('?') && !path.Contains('*'))
-                return DoGetSoftware(path);
+                return GetItems(path);
             var dir = Path.GetDirectoryName(path);
             var pattern = Path.GetFileName(path);
             return Directory.EnumerateFiles(dir, pattern)
-                .SelectMany(file => DoGetSoftware(file));
-        }
-
-        private IEnumerable<SoftwareInfo> DoGetSoftware(string path)
-        {
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                var name = Path.GetFileName(path);
-                return GetItems(stream, name);
-            }
+                .SelectMany(file => GetItems(file));
         }
 
         protected override SoftwareInfo DoGetItem(ZipFile zip, string name, ZipEntry entry)
