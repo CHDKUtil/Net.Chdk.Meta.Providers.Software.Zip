@@ -78,7 +78,7 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
                 var created = entry.DateTime.ToUniversalTime();
                 software.Product = ProductProvider.GetProduct(name, created);
                 UpdateSoftware(software);
-                software.Camera = CameraProvider.GetCamera(name);
+                software.Camera = GetCamera(name);
             }
 
             return software;
@@ -113,6 +113,16 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             software.Build = BuildProvider.GetBuild(software);
             software.Compiler = CompilerProvider.GetCompiler(software);
             software.Encoding = EncodingProvider.GetEncoding(software.Encoding);
+        }
+
+        private SoftwareCameraInfo GetCamera(string name)
+        {
+            var camera = CameraProvider.GetCamera(name);
+            return new SoftwareCameraInfo
+            {
+                Platform = camera.Platform,
+                Revision = camera.Revision,
+            };
         }
     }
 }
