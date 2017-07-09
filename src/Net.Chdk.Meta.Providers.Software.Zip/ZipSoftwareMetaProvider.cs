@@ -66,7 +66,10 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
         {
             var software = SoftwareDetector.GetSoftware(buffer, null, default(CancellationToken));
             if (software == null)
+            {
                 Logger.LogError("Cannot detect software");
+                return null;
+            }
 
             if (software.Camera != null)
             {
