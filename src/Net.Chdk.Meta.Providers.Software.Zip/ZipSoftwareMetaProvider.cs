@@ -40,14 +40,14 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             EncodingProvider = encodingProvider;
         }
 
-        public IEnumerable<SoftwareInfo> GetSoftware(string path)
+        public IEnumerable<SoftwareInfo> GetSoftware(string path, string productName)
         {
             if (!path.Contains('?') && !path.Contains('*'))
-                return GetItems(path);
+                return GetItems(path, productName);
             var dir = Path.GetDirectoryName(path);
             var pattern = Path.GetFileName(path);
             return Directory.EnumerateFiles(dir, pattern)
-                .SelectMany(file => GetItems(file));
+                .SelectMany(file => GetItems(file, productName));
         }
 
         protected override SoftwareInfo DoGetItem(ZipFile zip, string name, ZipEntry entry)
@@ -115,7 +115,7 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             software.Source = SourceProvider.GetSource(software);
             software.Build = BuildProvider.GetBuild(software);
             software.Compiler = CompilerProvider.GetCompiler(software);
-            software.Encoding = EncodingProvider.GetEncoding(software.Encoding);
+            software.Encoding = EncodingProvider.GetEncoding(software);
         }
 
         private SoftwareCameraInfo GetCamera(string name)
