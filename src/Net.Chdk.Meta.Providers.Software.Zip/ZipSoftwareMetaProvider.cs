@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Net.Chdk.Detectors.Software;
 using Net.Chdk.Meta.Providers.Zip;
 using Net.Chdk.Model.Software;
+using Net.Chdk.Providers.Boot;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +25,7 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
         private ICompilerMetaProvider CompilerProvider { get; }
         private IEncodingMetaProvider EncodingProvider { get; }
 
-        public ZipSoftwareMetaProvider(IBinarySoftwareDetector softwareDetector, ICategoryMetaProvider categoryProvider, IBootMetaProvider bootProvider,
+        public ZipSoftwareMetaProvider(IBinarySoftwareDetector softwareDetector, ICategoryMetaProvider categoryProvider, IBootProvider bootProvider,
             IProductMetaProvider productProvider, ICameraMetaProvider cameraProvider, ISourceMetaProvider sourceProvider,
             IBuildMetaProvider buildProvider, ICompilerMetaProvider compilerProvider, IEncodingMetaProvider encodingProvider,
             ILogger<ZipSoftwareMetaProvider> logger)
@@ -40,14 +41,14 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             EncodingProvider = encodingProvider;
         }
 
-        public IEnumerable<SoftwareInfo> GetSoftware(string path, string productName)
+        public IEnumerable<SoftwareInfo> GetSoftware(string path, string categoryName)
         {
             if (!path.Contains('?') && !path.Contains('*'))
-                return GetItems(path, productName);
+                return GetItems(path, categoryName);
             var dir = Path.GetDirectoryName(path);
             var pattern = Path.GetFileName(path);
             return Directory.EnumerateFiles(dir, pattern)
-                .SelectMany(file => GetItems(file, productName));
+                .SelectMany(file => GetItems(file, categoryName));
         }
 
         protected override SoftwareInfo DoGetItem(ZipFile zip, string name, ZipEntry entry)
