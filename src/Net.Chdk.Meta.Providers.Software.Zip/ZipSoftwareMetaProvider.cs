@@ -4,6 +4,7 @@ using Net.Chdk.Detectors.Software;
 using Net.Chdk.Meta.Providers.Zip;
 using Net.Chdk.Model.Software;
 using Net.Chdk.Providers.Boot;
+using Net.Chdk.Providers.Product;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,15 +26,15 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
         private ICompilerMetaProvider CompilerProvider { get; }
         private IEncodingMetaProvider EncodingProvider { get; }
 
-        public ZipSoftwareMetaProvider(IBinarySoftwareDetector softwareDetector, ICategoryMetaProvider categoryProvider, IBootProvider bootProvider,
-            IProductMetaProvider productProvider, ICameraMetaProvider cameraProvider, ISourceMetaProvider sourceProvider,
+        public ZipSoftwareMetaProvider(IProductProvider productProvider, IBinarySoftwareDetector softwareDetector, ICategoryMetaProvider categoryProvider, IBootProvider bootProvider,
+            IProductMetaProvider productMetaProvider, ICameraMetaProvider cameraProvider, ISourceMetaProvider sourceProvider,
             IBuildMetaProvider buildProvider, ICompilerMetaProvider compilerProvider, IEncodingMetaProvider encodingProvider,
             ILogger<ZipSoftwareMetaProvider> logger)
-            : base(bootProvider, logger)
+            : base(productProvider, bootProvider, logger)
         {
             SoftwareDetector = softwareDetector;
             CategoryProvider = categoryProvider;
-            ProductProvider = productProvider;
+            ProductProvider = productMetaProvider;
             CameraProvider = cameraProvider;
             SourceProvider = sourceProvider;
             BuildProvider = buildProvider;
@@ -41,17 +42,17 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             EncodingProvider = encodingProvider;
         }
 
-        public IEnumerable<SoftwareInfo> GetSoftware(string path, string categoryName)
+        public IEnumerable<SoftwareInfo> GetSoftware(string path, string productName)
         {
             if (!path.Contains('?') && !path.Contains('*'))
-                return GetItems(path, categoryName);
+                return GetItems(path, productName);
             var dir = Path.GetDirectoryName(path);
             var pattern = Path.GetFileName(path);
             return Directory.EnumerateFiles(dir, pattern)
-                .SelectMany(file => GetItems(file, categoryName));
+                .SelectMany(file => GetItems(file, productName));
         }
 
-        protected override SoftwareInfo DoGetItem(ZipFile zip, string name, ZipEntry entry)
+        protected override SoftwareInfo DoGetItem(ZipFile zip, string fileName, string productName, ZipEntry entry)
         {
             using (var stream = zip.GetInputStream(entry))
             using (var memoryStream = new MemoryStream((int)entry.Size))
@@ -59,11 +60,11 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
                 stream.CopyTo(memoryStream);
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 var buffer = memoryStream.ToArray();
-                return GetSoftware(buffer, name, entry);
+                return GetSoftware(buffer, productName, fileName, entry);
             }
         }
 
-        private SoftwareInfo GetSoftware(byte[] buffer, string name, ZipEntry entry)
+        private SoftwareInfo GetSoftware(byte[] buffer, string productName, string fileName, ZipEntry entry)
         {
             var software = SoftwareDetector.GetSoftware(buffer, null, default(CancellationToken));
             if (software == null)
@@ -74,25 +75,25 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
 
             if (software.Camera != null)
             {
-                ValidateSoftware(software, entry, name);
+                ValidateSoftware(software, entry, productName, fileName);
                 UpdateSoftware(software);
             }
             else
             {
                 var created = entry.DateTime.ToUniversalTime();
-                software.Product = ProductProvider.GetProduct(name, created);
+                software.Product = ProductProvider.GetProduct(fileName, created);
                 UpdateSoftware(software);
-                software.Camera = GetCamera(name);
+                software.Camera = GetCamera(productName, fileName);
             }
 
             return software;
         }
 
-        private void ValidateSoftware(SoftwareInfo software, ZipEntry entry, string name)
+        private void ValidateSoftware(SoftwareInfo software, ZipEntry entry, string productName, string fileName)
         {
             var created = entry.DateTime.ToUniversalTime();
-            var product = ProductProvider.GetProduct(name, created);
-            var camera = CameraProvider.GetCamera(name);
+            var product = ProductProvider.GetProduct(fileName, created);
+            var camera = CameraProvider.GetCamera(productName, fileName);
 
             if (!product.Name.Equals(software.Product.Name))
                 Logger.LogWarning("Mismatching product name: {0}", software.Product.Name);
@@ -119,9 +120,9 @@ namespace Net.Chdk.Meta.Providers.Software.Zip
             software.Encoding = EncodingProvider.GetEncoding(software);
         }
 
-        private SoftwareCameraInfo GetCamera(string name)
+        private SoftwareCameraInfo GetCamera(string productName, string fileName)
         {
-            var camera = CameraProvider.GetCamera(name);
+            var camera = CameraProvider.GetCamera(productName, fileName);
             return new SoftwareCameraInfo
             {
                 Platform = camera.Platform,
